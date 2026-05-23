@@ -69,8 +69,8 @@ El experimento evalúa la capacidad del modelo para separar datos bajo dos condi
 | Datos separables   | Convergencia exitosa   | El modelo encuentra con éxito el hiperplano de margen máximo.                  |
 | Datos superpuestos | Fallo en optimización | La región factible es vacía; el modelo colapsa ante la falta de separabilidad. |
 
-`<img src="./images/grafico_separable.png" width="300" alt="Datos Separables" />`
-`<img src="./images/grafico_superpuesto_fallo.png" width="300" alt="Datos Superpuestos" />`
+<img src="./images/grafico_separable.png" width="300" alt="Datos Separables" />
+<img src="./images/grafico_superpuesto_fallo.png" width="300" alt="Datos Superpuestos" />
 
 * **Interpretación del fallo:** La divergencia en el conjunto superpuesto, manifestada como Positive directional derivative for linesearch en consola, es la validación empírica fundamental. En un SVM de margen rígido, no existe un hiperplano que cumpla $y_i(w^T x_i + b) ≥ 1$ para todos los puntos simultáneamente cuando las clases se solapan. Matemáticamente, el optimizador intenta forzar una solución imposible y, ante la imposibilidad de satisfacer las restricciones, aborta la operación.
 
