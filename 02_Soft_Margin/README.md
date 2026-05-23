@@ -71,14 +71,14 @@ El experimento comparativo evaluó 15 configuraciones diferentes variando el tip
 La Proporción de Vectores de Soporte (VS) es la métrica de eficiencia:
 
 * **Kernel Lineal:** Presenta un desempeño subóptimo (Exactitud ~0.70). La alta proporción de vectores de soporte (98-100%) indica un subajuste (*underfitting*), el modelo es incapaz de separar la topología circular de los datos, forzando a casi todas las muestras a ser vectores de soporte.
-  `<img src="images/Linear_C1.0.png" width="300"/>`
+  `<img src="./images/Linear_C1.0.png" width="300" alt="Kernel Lineal" />`
 * **Kernels Polinomiales (Homogéneo e Inhomogéneo):** Logran una clasificación perfecta (Exactitud 1.0) con la menor proporción de vectores de soporte (~2.6% - 7.3%). Esto confirma que, dado que nuestros datos son anillos concéntricos, el mapeo polinomial de grado 2 encuentra una estructura matemática intrínseca (una elipse) que separa las clases con máxima parsimonia.
-  `<img src="images/Poly_Homo_C1.0.png" width="300"/>`
-  `<img src="images/Poly_Inhomo_C1.0.png" width="300"/>`
+  `<img src="./images/Poly_Homo_C1.0.png" width="300" alt="Polinomial Homogéneo" />`
+  `<img src="./images/Poly_Inhomo_C1.0.png" width="300" alt="Polinomial Inhomogéneo" />`
 * **Kernel RBG (Gaussiano):** Logra exactitud perfecta pero con una proporción de vectores de soporte mucho mayor (12% - 71%). Esto demuestra que el RBF, al ser extremadamente flexible (dimensión infinita), requiere más puntos de anclaje para "dibujar" la frontera, siendo más sensible al ruido y a la configuración de sus hiperparámetros.
-  `<img src="images/RBF_C1.0.png" width="300"/>`
+  `<img src="./images/RBF_C1.0.png" width="300" alt="Kernel RGB" />`
 * **Kernel Sigmoide:** Presenta resultados variables. Debido a que no siempre satisface la Condición de Mercer (ser definido positivo), el optimizador en ocasiones encuentra dificultades topológicas, resultando en un modelo menos estable que los kernels polinomiales para este conjunto de datos específico.
-  `<img src="images/Sigmoid_C1.0.png" width="300"/>`
+  `<img src="./images/Sigmoid_C1.0.png" width="300" alt="Kernel Sigmoide"/>`
 
 | Modelo / Kernel               | Exactitud | Puntuación F1 | Vectores de Soporte | Proporción VS (%) | Tiempo (s) |
 | ----------------------------- | --------- | -------------- | ------------------- | ------------------ | ---------- |

@@ -31,6 +31,3 @@ Para garantizar la reproducibilidad científica, el código ha sido desarrollado
 ---
 
 ⌨️ made with ❤️ by [Gustavo Rivero](https://github.com/gustavoerivero)
-"# SVM" 
-"# SVM" 
-"# SVM" 
