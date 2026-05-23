@@ -69,14 +69,16 @@ El experimento evalúa la capacidad del modelo para separar datos bajo dos condi
 | Datos separables   | Convergencia exitosa   | El modelo encuentra con éxito el hiperplano de margen máximo.                  |
 | Datos superpuestos | Fallo en optimización | La región factible es vacía; el modelo colapsa ante la falta de separabilidad. |
 
-<img src="./images/grafico_separable.png" width="300" alt="Datos Separables" />
-<img src="./images/grafico_superpuesto_fallo.png" width="300" alt="Datos Superpuestos" />
+<div style="display: flex; flex-direction: row;">
+  <img src="./images/grafico_separable.png" width="600" alt="Datos Separables" />
+  <img src="./images/grafico_superpuesto_fallo.png" width="600" alt="Datos Superpuestos" />
+</div>
 
 * **Interpretación del fallo:** La divergencia en el conjunto superpuesto, manifestada como Positive directional derivative for linesearch en consola, es la validación empírica fundamental. En un SVM de margen rígido, no existe un hiperplano que cumpla $y_i(w^T x_i + b) ≥ 1$ para todos los puntos simultáneamente cuando las clases se solapan. Matemáticamente, el optimizador intenta forzar una solución imposible y, ante la imposibilidad de satisfacer las restricciones, aborta la operación.
 
 ## 5. Conclusión
 
-El SVM de Margen Rígido es una pieza fundamental de la teoría de aprendizaje estadístico. Aunque su capacidad de generalización es excelente en entornos ideales, su principal limitación es la fragilidad ante el ruido. Los resultados obtenidos confirman que, para conjuntos de datos del mundo real donde las clases no son perfectamente separables, es indispensable migrar hacia una formulación de Margen Suave (Soft Margin), la cual introduce variables de holgura para permitir violaciones al margen y garantizar la convergencia del modelo.
+El SVM de Margen Rígido es una pieza fundamental de la teoría de aprendizaje estadístico. Aunque su capacidad de generalización es excelente en entornos ideales, su principal limitación es la fragilidad ante el ruido. Los resultados obtenidos confirman que, para conjuntos de datos del mundo real donde las clases no son perfectamente separables, es indispensable migrar hacia una formulación de [Margen Suave (Soft Margin)](https://github.com/gustavoerivero/SVM/tree/main/02_Soft_Margin), la cual introduce variables de holgura para permitir violaciones al margen y garantizar la convergencia del modelo.
 
 ---
 
