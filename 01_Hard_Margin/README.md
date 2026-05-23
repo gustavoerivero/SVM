@@ -38,13 +38,9 @@ El sistema está diseñado para demostrar la rigidez matemática de este modelo.
 ### Formulación Matemática
 
 * **Función Objetivo:**
-  $$
-  \min_{w, b} \frac{1}{2} \|w\|^2
-  $$
+  $\min_{w, b} \frac{1}{2} ||w||^2$
 * **Restricción:**
-  $$
-  y_i (w^T x_i + b) \geq 1, \quad \forall i = 1, \dots, n
-  $$
+  $y_i (w^T x_i + b) \geq 1, \quad \forall i = 1, \dots, n$
 
 Donde:
 
