@@ -69,8 +69,8 @@ El experimento demuestra la robustez del Margen Suave frente al colapso del Marg
 | Datos superpuestos | Convergencia exitosa | Los puntos dentro del margen (infracciones) alcanzan la restricción superior de caja ($\alpha = C$). |
 
 <div style="display: flex; flex-direction: row;">
-  <img src="./images/grafico_separable_primal.png" width="600" alt="Datos Separables" />
-  <img src="./images/grafico_superpuesto_primal.png" width="600" alt="Datos Superpuestos" />
+  <img src="./images/datos_separables_dual.png" width="600" alt="Datos Separables" />
+  <img src="./images/datos_superpuestos_dual.png" width="600" alt="Datos Superpuestos" />
 </div>
 
 * **Interpretación del fallo:** La formulación dual prueba empíricamente la propiedad de parsimonia (esparsidad) de la SVM. Como se observa en los gráficos, la inmensa mayoría de los puntos de entrenamiento reciben un $\alpha = 0$, siendo completamente ignorados para el cálculo final del hiperplano. Únicamente los puntos resaltados en dorado dictan la posición geométrica de la frontera.
