@@ -12,10 +12,11 @@ El siguiente repositorio documenta el desarrollo e implementación práctica de 
 
 ## 📂 Estructura del Repositorio
 
-| Proyecto            | Descripción                                                                           | Enlace                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Proyecto            | Descripción                                                                           | Enlace                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | 01. Hard Margin SVM | Implementación del SVM bajo formulación primal con restricciones de margen estricto. | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/01_Hard_Margin_Primal) |
 | 02. Soft Margin SVM | Implementación del SVM bajo formulación primal con restricciones de margen suave.    | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/02_Soft_Margin_Primal) |
+| 03. Modelo Dual     | Implementación del SVM bajo formulación dual con restricciones de margen suave.      | Ir al proyecto                                                                       |
 
 ## 🛠️ Stack Tecnológico
 
