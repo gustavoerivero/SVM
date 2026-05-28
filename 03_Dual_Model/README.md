@@ -50,7 +50,7 @@ Donde:
 * $\alpha_i$ son los Multiplicadores de Lagrange.
 * $C$ es la penalización de margen suave.
 * $x_i^T x_j$ representa el producto punto (Kernel lineal) entre las muestras.
-* $y_i \in \{-1, 1\}$ son las etiquetas de clase. _(Nota técnica: El uso algebraico de +1 y -1 es el catalizador que permite formular el producto de las etiquetas $y_i y_j$ en la matriz Hessiana, posibilitando la optimización convexa)._
+* $y_i \in \{-1, 1\}$ son las etiquetas de clase. _(Nota técnica: El uso algebraico de +1 y -1 es el catalizador que permite formular el producto de las etiquetas $y_i$ $y_j$ en la matriz Hessiana, posibilitando la optimización convexa)._
 
 ### Funciones Principales
 
