@@ -73,7 +73,18 @@ El experimento demuestra la robustez del Margen Suave frente al colapso del Marg
   <img src="./images/grafico_superpuesto_dual.png" width="600" alt="Datos Superpuestos" />
 </div>
 
-* **Interpretación del fallo:** La formulación dual prueba empíricamente la propiedad de parsimonia (esparsidad) de la SVM. Como se observa en los gráficos, la inmensa mayoría de los puntos de entrenamiento reciben un $\alpha = 0$, siendo completamente ignorados para el cálculo final del hiperplano. Únicamente los puntos resaltados en dorado dictan la posición geométrica de la frontera.
+* **Interpretación de los hallazgos:** La formulación dual prueba empíricamente la propiedad de **parsimonia** (esparsidad) de la SVM. Como se observa en los gráficos, la inmensa mayoría de los puntos de entrenamiento reciben un $\alpha = 0$, siendo completamente ignorados para el cálculo final del hiperplano. Únicamente los puntos resaltados en dorado dictan la posición geométrica de la frontera.
+
+### Conexión Primal-Dual (Condiciones KKT) y Dualidad Fuerte
+
+Al contrastar la inspección visual de este modelo dual con la formulación primal, se evidencia empíricamente el cumplimiento de la **Dualidad Fuerte** mediante las condiciones de Karush-Kuhn-Tucker (KKT). 
+
+Mientras que el modelo primal resaltaba exclusivamente las infracciones toleradas (holgura $\xi_i > 0$), este modelo dual revela la **arquitectura estructural completa**, iluminando todos los vectores de soporte ($\alpha_i > 0$). Analizando los multiplicadores exportados en los archivos CSV, podemos clasificar estos puntos dorados en dos categorías matemáticas:
+
+1. **Vectores de Soporte Libres ($0 < \alpha_i < C$):** Puntos que descansan con precisión milimétrica sobre las líneas del margen perfecto. En el modelo primal, su variable de holgura es estrictamente cero.
+2. **Vectores de Soporte Ligados ($\alpha_i = C$):** Puntos que saturan la restricción de caja. Corresponden exactamente a las muestras que han invadido el margen o cruzado el hiperplano (aquellos donde $\xi_i > 0$ en el modelo primal).
+
+Esta distinción gráfica demuestra que la formulación dual no solo halla la misma frontera óptima, sino que expone la importancia jerárquica de cada dato en el espacio de entrenamiento.
 
 ## 5. Conclusión
 

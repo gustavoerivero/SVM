@@ -43,6 +43,7 @@ El sistema está diseñado para demostrar cómo la flexibilidad matemática perm
   $y_i (w^T x_i + b) \geq 1 - \xi_i, \quad \xi_i \geq 0$
 
 Donde:
+
 * $C$ es el parámetro de regularización que controla el balance entre el margen y el error.
 * $\xi_i$ (slack variables) cuantifican la invasión del margen para cada muestra $i$.
 
@@ -57,17 +58,17 @@ El experimento demuestra la robustez del Margen Suave frente al colapso del Marg
 
 ### Escenarios de Prueba
 
-| Escenario          | Resultado              | Interpretación                                                                  |
-| ------------------ | ---------------------- | -------------------------------------------------------------------------------- |
-| Datos separables   | Convergencia exitosa   | Las variables de holgura tienden a cero, comportándose como un margen rígido.                 |
-| Datos superpuestos | Convergencia exitosa | Gracias a $\xi$, el modelo absorbe el ruido permitiendo una frontera de decisión válida. |
+| Escenario          | Resultado            | Interpretación                                                                             |
+| ------------------ | -------------------- | ------------------------------------------------------------------------------------------- |
+| Datos separables   | Convergencia exitosa | Las variables de holgura tienden a cero, comportándose como un margen rígido.             |
+| Datos superpuestos | Convergencia exitosa | Gracias a$\xi$, el modelo absorbe el ruido permitiendo una frontera de decisión válida. |
 
 <div style="display: flex; flex-direction: row;">
   <img src="./images/grafico_separable_primal.png" width="600" alt="Datos Separables" />
   <img src="./images/grafico_superpuesto_primal.png" width="600" alt="Datos Superpuestos" />
 </div>
 
-* **Interpretación del fallo:** A diferencia de la formulación rígida, el modelo de margen suave logra converger en el conjunto de datos superpuestos. Los nodos resaltados en dorado en la figura de la derecha representan las muestras que violan las condiciones del margen ($\xi > 0$). Estas variables de holgura actúan como una "red de seguridad" matemática que impide que el modelo colapse ante la falta de separabilidad lineal perfecta.
+* **Interpretación de los hallazgos:** A diferencia de la formulación rígida, el modelo de margen suave logra converger en el conjunto de datos superpuestos. Los nodos resaltados en dorado en la figura de la derecha representan las muestras que violan las condiciones del margen ($\xi > 0$). Estas variables de holgura actúan como una "red de seguridad" matemática que impide que el modelo colapse ante la falta de separabilidad lineal perfecta.
 
 ## 5. Conclusión
 
