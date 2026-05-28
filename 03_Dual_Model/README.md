@@ -19,12 +19,12 @@ Este proyecto está organizado para facilitar la trazabilidad de los experimento
 Asegúrese de tener instalado el entorno de Python con las bibliotecas necesarias:
 
 ```bash
-pip install numpy pandas scipy matplotlib
+pip install numpy pandas scipy matplotlib scikit-learn
 ```
 
 ### Ejecución
 
-Para evaluar ambos escenarios (datos separables y superpuestos), ejecute:
+Para evaluar la capacidad del modelo frente a los tres escenarios de complejidad creciente (separables, superpuestos y empíricos), ejecute:
 
 ```bash
 cd src
@@ -40,9 +40,8 @@ El sistema demuestra la elegancia de optimizar en el espacio de los multiplicado
 * *Función Objetivo (a Maximizar):*
 
   $\max_{\alpha} \sum_{i} \alpha_i - \frac{1}{2} \sum_{i} \sum_{j} \alpha_i \alpha_j y_i y_j (x_i^T x_j)$
-
 * *Restricciones:*
-  
+
   $\sum_{i} \alpha_i y_i = 0$
   $0 \leq \alpha_i \leq C, \quad \forall i$
 
@@ -51,6 +50,7 @@ Donde:
 * $\alpha_i$ son los Multiplicadores de Lagrange.
 * $C$ es la penalización de margen suave.
 * $x_i^T x_j$ representa el producto punto (Kernel lineal) entre las muestras.
+* $y_i \in \{-1, 1\}$ son las etiquetas de clase. _(Nota técnica: El uso algebraico de +1 y -1 es el catalizador que permite formular el producto de las etiquetas $y_i y_j$ en la matriz Hessiana, posibilitando la optimización convexa)._
 
 ### Funciones Principales
 
@@ -59,25 +59,27 @@ Donde:
 
 ## 4. Análisis de Resultados
 
-El experimento demuestra la robustez del Margen Suave frente al colapso del Margen Rígido.
+El experimento demuestra la robustez del Margen Suave y la esparsidad inherente a su Formulación Dual.
 
 ### Escenarios de Prueba
 
-| Escenario          | Resultado              | Interpretación                                                                  |
-| ------------------ | ---------------------- | -------------------------------------------------------------------------------- |
-| Datos separables   | Convergencia exitosa   | Solo los puntos estrictamente en los bordes del margen resultan tener $\alpha > 0$.                 |
-| Datos superpuestos | Convergencia exitosa | Los puntos dentro del margen (infracciones) alcanzan la restricción superior de caja ($\alpha = C$). |
+| Escenario                                | Resultado            | Interpretación                                                                                                                   |
+| ---------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Datos separables<br />(Sintético)       | Convergencia exitosa | Solo los puntos estrictamente en los bordes del margen resultan tener $\alpha > 0$.                                            |
+| Datos superpuestos<br />(Sintético)     | Convergencia exitosa | Los puntos dentro del margen (infracciones) alcanzan la restricción superior de caja ($\alpha = C$).                           |
+| Breast Cancer Wisconsin<br />(Empírico) | Convergencia exitosa | Demostración práctica: El algoritmo identifica exitosamente los vectores de soporte estructurales en datos oncológicos reales. |
 
-<div style="display: flex; flex-direction: row;">
-  <img src="./images/grafico_separable_dual.png" width="600" alt="Datos Separables" />
-  <img src="./images/grafico_superpuesto_dual.png" width="600" alt="Datos Superpuestos" />
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+  <img src="./images/grafico_separable_dual.png" width="32%" alt="Datos Separables" />
+  <img src="./images/grafico_superpuesto_dual.png" width="32%" alt="Datos Superpuestos" />
+  <img src="./images/grafico_real_breast_cancer_dual.png" width="32%" alt="Datos Empíricos" />
 </div>
 
 * **Interpretación de los hallazgos:** La formulación dual prueba empíricamente la propiedad de **parsimonia** (esparsidad) de la SVM. Como se observa en los gráficos, la inmensa mayoría de los puntos de entrenamiento reciben un $\alpha = 0$, siendo completamente ignorados para el cálculo final del hiperplano. Únicamente los puntos resaltados en dorado dictan la posición geométrica de la frontera.
 
 ### Conexión Primal-Dual (Condiciones KKT) y Dualidad Fuerte
 
-Al contrastar la inspección visual de este modelo dual con la formulación primal, se evidencia empíricamente el cumplimiento de la **Dualidad Fuerte** mediante las condiciones de Karush-Kuhn-Tucker (KKT). 
+Al contrastar la inspección visual de este modelo dual con la formulación primal, se evidencia empíricamente el cumplimiento de la **Dualidad Fuerte** mediante las condiciones de Karush-Kuhn-Tucker (KKT).
 
 Mientras que el modelo primal resaltaba exclusivamente las infracciones toleradas (holgura $\xi_i > 0$), este modelo dual revela la **arquitectura estructural completa**, iluminando todos los vectores de soporte ($\alpha_i > 0$). Analizando los multiplicadores exportados en los archivos CSV, podemos clasificar estos puntos dorados en dos categorías matemáticas:
 

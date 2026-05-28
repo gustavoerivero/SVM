@@ -1,8 +1,8 @@
-# SVM de Margen Suave (Soft Margin)
+# SVM de Margen Suave (Soft Margin) - Formulación Primal
 
 ---
 
-Este repositorio contiene la implementación de una Máquina de Vectores de Soporte (SVM) extendida mediante la formulación primal con variables de holgura. A diferencia del margen rígido, este modelo introduce una tolerancia al error, permitiendo la clasificación de conjuntos de datos donde la separabilidad lineal perfecta no es posible.
+Este repositorio contiene la implementación académica de una Máquina de Vectores de Soporte (SVM) extendida mediante la **formulación primal con variables de holgura**. A diferencia del margen rígido, este modelo introduce una tolerancia al error, permitiendo la clasificación de conjuntos de datos empíricos y ruidosos donde la separabilidad lineal perfecta no es posible.
 
 ## 1. Estructura del código
 
@@ -19,12 +19,12 @@ Este proyecto está organizado para facilitar la trazabilidad de los experimento
 Asegúrese de tener instalado el entorno de Python con las bibliotecas necesarias:
 
 ```bash
-pip install numpy pandas scipy matplotlib
+pip install numpy pandas scipy matplotlib scikit-learn
 ```
 
 ### Ejecución
 
-Para evaluar ambos escenarios (datos separables y superpuestos), ejecute:
+Para evaluar la capacidad del modelo frente a los tres escenarios de complejidad creciente (separables, superpuestos y empíricos), ejecute:
 
 ```bash
 cd src
@@ -44,8 +44,11 @@ El sistema está diseñado para demostrar cómo la flexibilidad matemática perm
 
 Donde:
 
+* $w$ es el vector normal al hiperplano.
+* $b$ es el término de sesgo (_bias_).
 * $C$ es el parámetro de regularización que controla el balance entre el margen y el error.
 * $\xi_i$ (slack variables) cuantifican la invasión del margen para cada muestra $i$.
+* $y_i \in \{-1, 1\}$ son las etiquetas de clase. _(Nota técnica: El uso algebraico de +1 y -1 permite condensar las restricciones operativas de ambas clases en una única inecuación convexa)._
 
 ### Funciones Principales
 
@@ -58,21 +61,23 @@ El experimento demuestra la robustez del Margen Suave frente al colapso del Marg
 
 ### Escenarios de Prueba
 
-| Escenario          | Resultado            | Interpretación                                                                             |
-| ------------------ | -------------------- | ------------------------------------------------------------------------------------------- |
-| Datos separables   | Convergencia exitosa | Las variables de holgura tienden a cero, comportándose como un margen rígido.             |
-| Datos superpuestos | Convergencia exitosa | Gracias a$\xi$, el modelo absorbe el ruido permitiendo una frontera de decisión válida. |
+| Escenario                                | Resultado            | Interpretación                                                                                                                                                              |
+| ---------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Datos separables<br />(Sintético)       | Convergencia exitosa | Las variables de holgura tienden a cero (**$\xi \approx 0$**). El modelo prioriza la maximización del margen, comportándose de manera análoga al margen rígido.  |
+| Datos superpuestos<br />(Sintético)     | Convergencia exitosa | Gracias a **$\xi_i$**, el modelo absorbe el ruido posibilitando el trazado de una frontera de decisión válida a cambio de una penalización regulada por **$C$**. |
+| Breast Cancer Wisconsin<br />(Empírico) | Convergencia exitosa | Demostración práctica: El algoritmo logra clasificar datos oncológicos superpuestos (proyectados vía PCA) aislando y marcando los casos médicos "atípicos".            |
 
-<div style="display: flex; flex-direction: row;">
-  <img src="./images/grafico_separable_primal.png" width="600" alt="Datos Separables" />
-  <img src="./images/grafico_superpuesto_primal.png" width="600" alt="Datos Superpuestos" />
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+  <img src="./images/grafico_separable_primal.png" width="32%" alt="Datos Separables" />
+  <img src="./images/grafico_superpuesto_primal.png" width="32%" alt="Datos Superpuestos" />
+  <img src="./images/grafico_real_breast_cancer_primal.png" width="32%" alt="Datos Empíricos" />
 </div>
 
-* **Interpretación de los hallazgos:** A diferencia de la formulación rígida, el modelo de margen suave logra converger en el conjunto de datos superpuestos. Los nodos resaltados en dorado en la figura de la derecha representan las muestras que violan las condiciones del margen ($\xi > 0$). Estas variables de holgura actúan como una "red de seguridad" matemática que impide que el modelo colapse ante la falta de separabilidad lineal perfecta.
+* **Interpretación de los hallazgos:** A diferencia de la formulación rígida que colapsaría irremediablemente ante el conjunto empírico de cáncer de mama, el modelo de margen suave logra converger aislando el ruido. Los nodos resaltados en dorado representan las muestras que violan las condiciones del margen ($\xi > 0$). Estas variables de holgura actúan como una "red de seguridad" matemática que impide el fallo del optimizador.
 
 ## 5. Conclusión
 
-La implementación de la formulación primal con variables de holgura representa un avance significativo respecto al Margen Rígido. Este modelo nos permite gestionar datos del mundo real caracterizados por el ruido y la superposición de clases, manteniendo la elegancia matemática de la optimización convexa. La capacidad de identificar las infracciones de margen mediante los valores de $\xi$ nos brinda una herramienta diagnóstica invaluable para entender la calidad y la separabilidad inherente de nuestros datos.
+La implementación de la formulación primal con variables de holgura representa un avance insustituible respecto al Margen Rígido. Este modelo nos permite gestionar datos del mundo real caracterizados por el ruido intrínseco y la superposición de clases, manteniendo intacta la elegancia geométrica de la optimización convexa. Adicionalmente, la capacidad de extraer e identificar numéricamente las infracciones de margen ($\xi > 0$) nos brinda una poderosa herramienta diagnóstica para auditar la separabilidad de nuestros datos.
 
 ---
 

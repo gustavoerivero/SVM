@@ -19,12 +19,12 @@ Este proyecto está organizado para facilitar la trazabilidad de los experimento
 Asegúrese de tener instalado el entorno de Python con las bibliotecas necesarias:
 
 ```bash
-pip install numpy pandas scipy matplotlib
+pip install numpy pandas scipy matplotlib scikit-learn
 ```
 
 ### Ejecución
 
-Para evaluar ambos escenarios (datos separables y superpuestos), ejecute:
+Para evaluar los tres escenarios (datos separables, superpuestos y empíricos), ejecute:
 
 ```bash
 cd src
@@ -47,7 +47,7 @@ Donde:
 * $w$ es el vector normal al hiperplano.
 * $b$ es el término de sesgo (_bias_).
 * $x_i$ son los vectores de entrada.
-* $y_i \in \{-1, 1\}$ son las etiquetas de clase.
+* $y_i \in \{-1, 1\}$ son las etiquetas de clase. _(Nota técnica: La elección algebraica de +1 y -1 como etiquetas no es arbitraria; permite condensar las restricciones de ambas clases en una única inecuación maestra, haciendo posible la optimización convexa)._
 
 ### Funciones Principales
 
@@ -60,17 +60,19 @@ El experimento evalúa la capacidad del modelo para separar datos bajo dos condi
 
 ### Escenarios de Prueba
 
-| Escenario          | Resultado              | Interpretación                                                                  |
-| ------------------ | ---------------------- | -------------------------------------------------------------------------------- |
-| Datos separables   | Convergencia exitosa   | El modelo encuentra con éxito el hiperplano de margen máximo.                  |
-| Datos superpuestos | Fallo en optimización | La región factible es vacía; el modelo colapsa ante la falta de separabilidad. |
+| Escenario                                | Resultado              | Interpretación                                                                                                                 |
+| ---------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Datos separables<br />(Sintético)       | Convergencia exitosa   | El modelo encuentra con éxito el hiperplano de margen máximo.                                                                 |
+| Datos superpuestos<br />(Sintético)     | Fallo en optimización | La región factible es vacía; el modelo colapsa ante la falta de separabilidad.                                                |
+| Breast Cancer Wisconsin<br />(Empírico) | Fallo en optimización | Demostración práctica: Los datos oncológicos reales (reducidos vía PCA) presentan superposición natural. El modelo aborta. |
 
-<div style="display: flex; flex-direction: row;">
-  <img src="./images/grafico_separable.png" width="600" alt="Datos Separables" />
-  <img src="./images/grafico_superpuesto_fallo.png" width="600" alt="Datos Superpuestos" />
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+  <img src="./images/grafico_separable.png" width="32%" alt="Datos Separables" />
+  <img src="./images/grafico_superpuesto_fallo.png" width="32%" alt="Datos Superpuestos" />
+  <img src="./images/grafico_real_breast_cancer_fallo.png" width="32%" alt="Datos Empíricos" />
 </div>
 
-* **Interpretación del fallo:** La divergencia en el conjunto superpuesto, manifestada como Positive directional derivative for linesearch en consola, es la validación empírica fundamental. En un SVM de margen rígido, no existe un hiperplano que cumpla $y_i(w^T x_i + b) ≥ 1$ para todos los puntos simultáneamente cuando las clases se solapan. Matemáticamente, el optimizador intenta forzar una solución imposible y, ante la imposibilidad de satisfacer las restricciones, aborta la operación.
+* **Interpretación del fallo:** La divergencia en los conjuntos superpuesto y empírico, manifestada como Positive directional derivative for linesearch en consola, es la validación empírica fundamental. En un SVM de margen rígido, no existe un hiperplano que cumpla $y_i(w^T x_i + b) ≥ 1$ para todos los puntos simultáneamente cuando las clases se solapan. Matemáticamente, el optimizador intenta forzar una solución imposible y, ante la imposibilidad de satisfacer las restricciones, aborta la operación.
 
 ## 5. Conclusión
 
