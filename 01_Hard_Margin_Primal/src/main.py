@@ -5,6 +5,10 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from typing import Tuple, Optional
 
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 def setup_dirs() -> None:
     """
     Crea los directorios necesarios para almacenar los datos y los artefactos visuales.
@@ -43,6 +47,31 @@ def get_overlapping_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]
     X = np.vstack((X1, X2))
     y = np.hstack((np.ones(num_samples), -np.ones(num_samples)))
     return X, y
+
+def get_tangible_data() -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Carga, estandariza y reduce dimensionalmente el conjunto de datos empírico Breast Cancer Wisconsin.
+    
+    Se emplea StandardScaler para centrar los datos (μ=0, σ=1), un requisito matemático indispensable 
+    para la convergencia de la SVM. Posteriormente, PCA proyecta las 30 dimensiones originales 
+    a un espacio bidimensional (R²) para permitir su inspección visual y geométrica.
+    
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Componentes principales (X) y etiquetas en formato {-1, 1} (y).
+    """
+    data = load_breast_cancer()
+    X_raw = data.data
+    y_raw = data.target
+    
+    y = np.where(y_raw == 0, -1, 1)
+    
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_raw)
+    
+    pca = PCA(n_components=2, random_state=42)
+    X_pca = pca.fit_transform(X_scaled)
+    
+    return X_pca, y
 
 def fit_svm(X: np.ndarray, y: np.ndarray) -> Tuple[Optional[np.ndarray], Optional[float]]:
     """
@@ -201,6 +230,22 @@ def main() -> None:
         print("\nResultado esperado: El modelo de margen rígido colapsa por falta de separabilidad.")
         export_results(X_mix, y_mix, None, None, "datos_superpuestos")
         plot_svm(X_mix, y_mix, None, None, "Fallo de Optimización - Ausencia de Separabilidad Lineal", "grafico_superpuesto_fallo.png")
+
+    print("\n=== EVALUACIÓN EMPÍRICA: BREAST CANCER WISCONSIN (PCA 2D) ===")
+    print("\n=== EVALUACIÓN EMPÍRICA: BREAST CANCER WISCONSIN (PCA 2D) ===")
+    X_real, y_real = get_tangible_data()
+    
+    w_real, b_real = fit_svm(X_real, y_real)
+    
+    if w_real is not None:
+        print("\nConvergencia inesperada en datos empíricos de alta dimensionalidad.")
+        export_results(X_real, y_real, w_real, b_real, "datos_reales_breast_cancer")
+        plot_svm(X_real, y_real, w_real, b_real, "SVM Margen Rígido - Datos Reales PCA", "grafico_real_breast_cancer.png")
+    else:
+        # Este es el bloque que se ejecutará, demostrando la fragilidad del modelo rígido
+        print("\nResultado esperado: El modelo de margen rígido colapsa ante la superposición intrínseca de los datos médicos reales.")
+        export_results(X_real, y_real, None, None, "datos_reales_breast_cancer_fallo")
+        plot_svm(X_real, y_real, None, None, "Fallo de Optimización - Ausencia de Separabilidad Lineal en Datos Reales", "grafico_real_breast_cancer_fallo.png")
 
 if __name__ == '__main__':
     main()

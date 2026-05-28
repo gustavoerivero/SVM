@@ -5,16 +5,19 @@ import scipy.optimize as opt
 import matplotlib.pyplot as plt
 from typing import Tuple, Optional
 
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 VISUALS_DIR = os.path.join(BASE_DIR, "images")
 
-# Generador estocástico centralizado
 RNG = None
 
 def setup() -> None:
     """
-    Inicializa el entorno y establece la semilla estocástica global.
+    Inicializa el entorno, crea los directorios necesarios y establece la semilla estocástica global.
     """
     global RNG
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -22,7 +25,9 @@ def setup() -> None:
     RNG = np.random.default_rng(42)
 
 def get_separable_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]: 
-    """Genera un conjunto de datos bidimensional linealmente separable."""
+    """
+    Genera un conjunto de datos bidimensional linealmente separable para clasificación binaria.
+    """
     if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup().")
     X1 = RNG.standard_normal((num_samples, 2)) + np.array([2.5, 2.5])
     X2 = RNG.standard_normal((num_samples, 2)) + np.array([-2.5, -2.5])
@@ -31,7 +36,9 @@ def get_separable_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]:
     return X, y
 
 def get_overlapping_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]:
-    """Genera un conjunto de datos bidimensional no linealmente separable."""
+    """
+    Genera un conjunto de datos bidimensional no linealmente separable con clústeres superpuestos.
+    """
     if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup().")
     X1 = RNG.standard_normal((num_samples, 2)) + np.array([0.5, 0.5])
     X2 = RNG.standard_normal((num_samples, 2)) + np.array([-0.5, -0.5])
@@ -39,35 +46,56 @@ def get_overlapping_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]
     y = np.hstack((np.ones(num_samples), -np.ones(num_samples)))
     return X, y
 
+def get_tangible_data() -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Carga, estandariza y reduce dimensionalmente el conjunto de datos empírico Breast Cancer Wisconsin.
+    
+    Se emplea StandardScaler para centrar los datos (μ=0, σ=1), un requisito matemático indispensable 
+    para la convergencia de la SVM. Posteriormente, PCA proyecta las 30 dimensiones originales 
+    a un espacio bidimensional (R²) para permitir su inspección visual y geométrica.
+    
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Componentes principales (X) y etiquetas en formato {-1, 1} (y).
+    """
+    data = load_breast_cancer()
+    X_raw = data.data
+    y_raw = data.target
+    
+    y = np.where(y_raw == 0, -1, 1)
+    
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_raw)
+    
+    pca = PCA(n_components=2, random_state=42)
+    X_pca = pca.fit_transform(X_scaled)
+    
+    return X_pca, y
+
 def fit_dual_soft_margin(X: np.ndarray, y: np.ndarray, C: float = 1.0) -> Tuple[Optional[np.ndarray], Optional[float], Optional[np.ndarray]]:
     """
-    Ajusta una SVM utilizando la Formulación Dual.
+    Ajusta una SVM de Margen Suave utilizando la Formulación Dual.
     
-    Maximiza (minimiza el negativo de): Obj(α) = ∑ αᵢ - ½ ∑ᵢ∑ⱼ αᵢαⱼyᵢyⱼ(xᵢᵀxⱼ)
+    Se precomputa la matriz del Kernel Lineal (K = X @ X.T) y la matriz Hessiana para
+    maximizar (minimizando su negativo) la función objetivo. Luego se reconstruyen los pesos
+    (w) y el sesgo (b) utilizando exclusivamente los Vectores de Soporte descubiertos.
+    
+    Objetivo a minimizar: Obj(α) = 0.5 * αᵀ H α - 1ᵀ α
     Sujeto a: ∑ αᵢyᵢ = 0
               0 ≤ αᵢ ≤ C
     """
     num_samples, _ = X.shape
     
-    # Matriz del Kernel Lineal precomputada: K = X @ X.T
     K = np.dot(X, X.T)
-    # Matriz Hessiana: H_ij = y_i * y_j * K_ij
     H = np.outer(y, y) * K
 
     def dual_objective(alphas: np.ndarray) -> float:
-        # 0.5 * αᵀ H α - 1ᵀ α
         return 0.5 * np.dot(alphas, np.dot(H, alphas)) - np.sum(alphas)
     
     def dual_gradient(alphas: np.ndarray) -> np.ndarray:
-        # H α - 1
         return np.dot(H, alphas) - np.ones(num_samples)
 
-    # Restricción de igualdad: ∑ αᵢyᵢ = 0
     constraints = {'type': 'eq', 'fun': lambda a: np.dot(a, y), 'jac': lambda a: y}
-    
-    # Restricción de caja: 0 ≤ αᵢ ≤ C
     bounds = [(0.0, C) for _ in range(num_samples)]
-    
     initial_alphas = np.zeros(num_samples)
 
     result = opt.minimize(
@@ -83,18 +111,15 @@ def fit_dual_soft_margin(X: np.ndarray, y: np.ndarray, C: float = 1.0) -> Tuple[
     if result.success:
         alphas = result.x
         
-        # Identificar Vectores de Soporte (α > 0)
         sv_indices = alphas > 1e-5
         
-        # Reconstruir el vector de pesos (w = ∑ αᵢyᵢxᵢ)
         w_optimal = np.sum((alphas[sv_indices] * y[sv_indices])[:, None] * X[sv_indices], axis=0)
         
-        # Calcular el sesgo (b) usando un Vector de Soporte Libre (0 < α < C)
         free_sv = (alphas > 1e-5) & (alphas < C - 1e-5)
         if np.any(free_sv):
             idx = np.where(free_sv)[0][0]
         else:
-            idx = np.where(sv_indices)[0][0] # Fallback
+            idx = np.where(sv_indices)[0][0] 
             
         b_optimal = y[idx] - np.dot(w_optimal, X[idx])
         
@@ -104,7 +129,10 @@ def fit_dual_soft_margin(X: np.ndarray, y: np.ndarray, C: float = 1.0) -> Tuple[
         return None, None, None
     
 def export_results(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Optional[float], alphas: Optional[np.ndarray], base_filename: str) -> None:
-    """Exporta los resultados y los Multiplicadores de Lagrange (α)."""
+    """
+    Crea un DataFrame de pandas, muestra una vista previa en consola y exporta los datos 
+    a formato CSV y Excel, incluyendo el cálculo de los Multiplicadores de Lagrange (α).
+    """
     data_dict = {
         'Característica_1': X[:, 0],
         'Característica_2': X[:, 1],
@@ -123,12 +151,27 @@ def export_results(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Opt
         data_dict['Clasificación_Correcta'] = (predictions == y)
 
     df = pd.DataFrame(data_dict)
+
+    print(f"\n--- Vista Previa de los Datos: {base_filename} ---")
+    print(df.head(5).to_string())
+    print("...")
+
     csv_filename = os.path.join(DATA_DIR, f"{base_filename}.csv")
     df.to_csv(csv_filename, index=False)
     print(f"Éxito: Datos exportados a '{csv_filename}'")
 
+    try:
+        excel_filename = os.path.join(DATA_DIR, f"{base_filename}.xlsx")
+        df.to_excel(excel_filename, index=False)
+        print(f"Éxito: Datos exportados a '{excel_filename}'")
+    except ImportError:
+        print("Aviso: No se pudo exportar a Excel por falta de la biblioteca 'openpyxl'.")
+
 def plot_svm(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Optional[float], alphas: Optional[np.ndarray], title_message: str, image_filename: str) -> None:
-    """Visualiza el hiperplano y resalta los Vectores de Soporte (α > 0)."""
+    """
+    Visualiza el conjunto de datos en el plano bidimensional, traza el hiperplano óptimo y 
+    resalta explícitamente mediante contornos dorados aquellos puntos que son Vectores de Soporte (α > 0).
+    """
     plt.figure(figsize=(8, 6))
     plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='navy', marker='o', alpha=0.7, label='Clase Positiva (+1)')
     plt.scatter(X[y == -1][:, 0], X[y == -1][:, 1], color='maroon', marker='x', alpha=0.7, label='Clase Negativa (-1)')
@@ -182,6 +225,16 @@ def main() -> None:
         print("\nConvergencia exitosa. Vectores de soporte identificados en clústeres superpuestos.")
         export_results(X_mix, y_mix, w_mix, b_mix, a_mix, "datos_superpuestos_dual")
         plot_svm(X_mix, y_mix, w_mix, b_mix, a_mix, f"SVM Margen Suave (Dual, C={C_param}) - Superpuestas", "grafico_superpuesto_dual.png")
+
+    print("\n=== EVALUACIÓN EMPÍRICA: BREAST CANCER WISCONSIN (PCA 2D) ===")
+    X_real, y_real = get_tangible_data()
+    
+    w_real, b_real, a_real = fit_dual_soft_margin(X_real, y_real, C=C_param)
+    
+    if w_real is not None:
+        print("\nConvergencia exitosa en datos empíricos de alta dimensionalidad.")
+        export_results(X_real, y_real, w_real, b_real, a_real, "datos_reales_breast_cancer_dual")
+        plot_svm(X_real, y_real, w_real, b_real, a_real, f"SVM Margen Suave Dual (Datos Reales PCA, C={C_param})", "grafico_real_breast_cancer_dual.png")
 
 if __name__ == '__main__':
     main()

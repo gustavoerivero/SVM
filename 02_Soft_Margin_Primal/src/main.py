@@ -5,9 +5,16 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from typing import Tuple, Optional
 
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 VISUALS_DIR = os.path.join(BASE_DIR, "images")
+
+# Generador estocástico centralizado
+RNG = None
 
 def setup_dirs() -> None:
     """
@@ -19,10 +26,8 @@ def setup_dirs() -> None:
     RNG = np.random.default_rng(42)
 
 def get_separable_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]: 
-    """
-    Genera un conjunto de datos bidimensional linealmente separable para clasificación binaria.
-    """
-    if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup().")
+    """Genera un conjunto de datos bidimensional linealmente separable para clasificación binaria."""
+    if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup_dirs().")
     
     X1 = RNG.standard_normal((num_samples, 2)) + np.array([2.5, 2.5])
     X2 = RNG.standard_normal((num_samples, 2)) + np.array([-2.5, -2.5])
@@ -31,10 +36,8 @@ def get_separable_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]:
     return X, y
 
 def get_overlapping_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Genera un conjunto de datos bidimensional no linealmente separable con clústeres superpuestos.
-    """
-    if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup().")
+    """Genera un conjunto de datos bidimensional no linealmente separable con clústeres superpuestos."""
+    if RNG is None: raise RuntimeError("El entorno no ha sido inicializado. Ejecute setup_dirs().")
     
     X1 = RNG.standard_normal((num_samples, 2)) + np.array([0.5, 0.5])
     X2 = RNG.standard_normal((num_samples, 2)) + np.array([-0.5, -0.5])
@@ -42,15 +45,27 @@ def get_overlapping_data(num_samples: int = 50) -> Tuple[np.ndarray, np.ndarray]
     y = np.hstack((np.ones(num_samples), -np.ones(num_samples)))
     return X, y
 
+def get_tangible_data() -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Carga, estandariza y reduce dimensionalmente el conjunto de datos empírico Breast Cancer Wisconsin.
+    """
+    data = load_breast_cancer()
+    X_raw = data.data
+    y_raw = data.target
+    
+    y = np.where(y_raw == 0, -1, 1)
+    
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_raw)
+    
+    pca = PCA(n_components=2, random_state=42)
+    X_pca = pca.fit_transform(X_scaled)
+    
+    return X_pca, y
+
 def fit_primal_soft_margin(X: np.ndarray, y: np.ndarray, C: float = 1.0) -> Tuple[Optional[np.ndarray], Optional[float], Optional[np.ndarray]]:
     """
     Ajusta una Máquina de Vectores de Soporte de Margen Suave utilizando la formulación primal.
-    
-    Introduce las variables de holgura (ξ) para tolerar la no separabilidad lineal.
-    
-    Función objetivo: min(w, b, ξ) ½ ‖w‖² + C ∑ ξᵢ
-    Sujeto a: yᵢ(wᵀxᵢ + b) ≥ 1 - ξᵢ
-              ξᵢ ≥ 0
     """
     num_samples, num_features = X.shape
 
@@ -90,7 +105,7 @@ def fit_primal_soft_margin(X: np.ndarray, y: np.ndarray, C: float = 1.0) -> Tupl
     
 def export_results(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Optional[float], xi: Optional[np.ndarray], base_filename: str) -> None:
     """
-    Exporta los resultados incluyendo el valor de las variables de holgura que identifican la separabilidad.
+    Crea un DataFrame de pandas, muestra una vista previa en consola y exporta los datos a CSV y Excel.
     """
     data_dict = {
         'Característica_1': X[:, 0],
@@ -111,9 +126,20 @@ def export_results(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Opt
 
     df = pd.DataFrame(data_dict)
 
+    print(f"\n--- Vista Previa de los Datos: {base_filename} ---")
+    print(df.head(5).to_string())
+    print("...")
+
     csv_filename = os.path.join(DATA_DIR, f"{base_filename}.csv")
     df.to_csv(csv_filename, index=False)
     print(f"Éxito: Datos exportados a '{csv_filename}'")
+
+    try:
+        excel_filename = os.path.join(DATA_DIR, f"{base_filename}.xlsx")
+        df.to_excel(excel_filename, index=False)
+        print(f"Éxito: Datos exportados a '{excel_filename}'")
+    except ImportError:
+        print("Aviso: No se pudo exportar a Excel por falta de la biblioteca 'openpyxl'.")
 
 def plot_svm(X: np.ndarray, y: np.ndarray, w: Optional[np.ndarray], b: Optional[float], xi: Optional[np.ndarray], title_message: str, image_filename: str) -> None:
     """
@@ -179,6 +205,18 @@ def main() -> None:
         plot_svm(X_mix, y_mix, w_mix, b_mix, xi_mix, f"SVM Margen Suave (Primal, C={C_param}) - Superpuestas", "grafico_superpuesto_primal.png")
     else:
         print("\nEl modelo colapsó inesperadamente.")
+
+    print("\n=== EVALUACIÓN EMPÍRICA: BREAST CANCER WISCONSIN (PCA 2D) ===")
+    X_real, y_real = get_tangible_data()
+    
+    w_real, b_real, xi_real = fit_primal_soft_margin(X_real, y_real, C=C_param)
+    
+    if w_real is not None:
+        print("\nConvergencia exitosa en datos empíricos de alta dimensionalidad.")
+        export_results(X_real, y_real, w_real, b_real, xi_real, "datos_reales_breast_cancer_primal")
+        plot_svm(X_real, y_real, w_real, b_real, xi_real, f"SVM Margen Suave Primal (Datos Reales PCA, C={C_param})", "grafico_real_breast_cancer_primal.png")
+    else:
+        print("\nEl modelo colapsó inesperadamente en el conjunto empírico.")
 
 if __name__ == '__main__':
     main()
