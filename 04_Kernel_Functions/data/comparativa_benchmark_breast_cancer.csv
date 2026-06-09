@@ -1,0 +1,5 @@
+Núcleo (Kernel),Tiempo (Segundos),Vectores de Soporte,Tasa de VS (%),Precisión (%)
+Lineal,4.6318,77 / 569,13.53,95.43
+Polinomial,4.1821,75 / 569,13.18,95.43
+RBF_Gaussiano,17.1007,239 / 569,42.0,96.13
+Sigmoidal,5.2134,85 / 569,14.94,90.86
