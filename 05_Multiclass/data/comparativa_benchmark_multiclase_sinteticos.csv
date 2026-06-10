@@ -1,0 +1,5 @@
+Estrategia,Núcleo (Kernel),Modelos Entrenados,Tiempo (Segundos),Precisión (%)
+OvR,Lineal,5,0.398,92.67
+OvR,RBF_Gaussiano,5,1.4011,98.0
+OvO,Lineal,10,0.068,95.33
+OvO,RBF_Gaussiano,10,0.1691,98.0

@@ -29,9 +29,9 @@ def kernel_linear(X1: np.ndarray, X2: np.ndarray) -> np.ndarray:
     """Calcula el Kernel Lineal."""
     return np.dot(X1, X2.T)
 
-def kernel_polynomial(X1: np.ndarray, X2: np.ndarray, degree: int = 3, gamma: float = 1.0, coef0: float = 1.0) -> np.ndarray:
-    """Calcula el Kernel Polinomial no homogéneo."""
-    return (gamma * np.dot(X1, X2.T) + coef0) ** degree
+def kernel_polynomial(X1: np.ndarray, X2: np.ndarray, degree: int = 3) -> np.ndarray:
+    """Calcula el Kernel Polinomial Homogéneo."""
+    return np.dot(X1, X2.T) ** degree
 
 def kernel_rbf(X1: np.ndarray, X2: np.ndarray, gamma: float = 1.0) -> np.ndarray:
     """Calcula el Kernel Gaussiano (Radial Basis Function)."""
@@ -251,7 +251,7 @@ def evaluate_kernels(X: np.ndarray, y: np.ndarray, dataset_name: str) -> None:
     
     kernels = {
         "Lineal": (kernel_linear, {}),
-        "Polinomial": (kernel_polynomial, {'degree': 2, 'gamma': 1.0, 'coef0': 1.0}),
+        "Polinomial": (kernel_polynomial, {'degree': 2}),
         "RBF_Gaussiano": (kernel_rbf, {'gamma': 1.0}),
         "Sigmoidal": (kernel_sigmoid, {'gamma': 0.05, 'coef0': 0.0})
     }

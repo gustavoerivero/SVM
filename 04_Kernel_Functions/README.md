@@ -44,7 +44,7 @@ El sistema demuestra la elegancia de optimizar en el espacio de los multiplicado
   $0 \leq \alpha_i \leq C, \quad \forall i$
 * **Catálogo de Núcleos $K$ ($x_i$, $x_j$) implementados:**
 * **Lineal:** $x_i^T x_j$
-* **Polinomial:** $(\gamma x_i^T x_j + r)^d$
+* **Polinomial (Homogéneo):** $(x_i^T x_j)^d$
 * **Gaussiano (RBF):** $\exp(-\gamma ||x_i - x_j||^2)$
 * **Sigmoidal:** $\tanh(\gamma x_i^T x_j + r)$
 
@@ -64,27 +64,28 @@ La siguiente tabla consolida la auditoría de rendimiento algorítmico, detallan
 
 #### Evaluación I: Datos Sintéticos (Topología Circular en R²)
 
-| Núcleo (Kernel) | Tiempo de Entrenamiento | Retención de Vectores de Soporte | Precisión (%) | Interpretación Geométrica |
-| :--- | :--- | :--- | :--- | :--- |
-| **Lineal** | $0.0602$ s | $87\%$ ($87 / 100$) | $73.0\%$ | **Fallo estructural.** Corta el espacio de manera rígida, forzando al modelo a utilizar casi todos los datos como soporte para minimizar la pérdida sin lograr convergencia. |
-| **Polinomial (d=2)** | $0.0452$ s | **$5\%$ ($5 / 100$)** | **$100.0\%$** | **Ajuste óptimo.** Aprovecha la naturaleza cuadrática inherente de los círculos, modelando la frontera perfecta con extrema esparsidad. |
-| **RBF (Gaussiano)** | $0.0651$ s | $42\%$ ($42 / 100$) | $100.0\%$ | **Ajuste altamente flexible.** Logra precisión total, pero a costa de una parsimonia considerablemente menor en comparación con el núcleo polinomial. |
-| **Sigmoidal** | $0.0805$ s | $92\%$ ($92 / 100$) | $72.0\%$ | **Fallo estructural.** Al igual que el modelo lineal, es incapaz de capturar la topología cerrada de los clústeres. |
+| Núcleo (Kernel)           | Tiempo de Entrenamiento | Retención de Vectores de Soporte | Precisión (%)        | Interpretación Geométrica                                                                                                                                                          |
+| :------------------------- | :---------------------- | :-------------------------------- | :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Lineal**           | $0.0602$ s            | $87\%$ ($87 / 100$)           | $73.0\%$            | **Fallo estructural.** Corta el espacio de manera rígida, forzando al modelo a utilizar casi todos los datos como soporte para minimizar la pérdida sin lograr convergencia. |
+| **Polinomial (d=2)** | $0.0452$ s            | **$5\%$ ($5 / 100$)**   | **$100.0\%$** | **Ajuste óptimo.** Aprovecha la naturaleza cuadrática inherente de los círculos, modelando la frontera perfecta con extrema esparsidad.                                     |
+| **RBF (Gaussiano)**  | $0.0651$ s            | $42\%$ ($42 / 100$)           | $100.0\%$           | **Ajuste altamente flexible.** Logra precisión total, pero a costa de una parsimonia considerablemente menor en comparación con el núcleo polinomial.                       |
+| **Sigmoidal**        | $0.0805$ s            | $92\%$ ($92 / 100$)           | $72.0\%$            | **Fallo estructural.** Al igual que el modelo lineal, es incapaz de capturar la topología cerrada de los clústeres.                                                          |
 
 #### Evaluación II: Datos Empíricos (Breast Cancer Wisconsin en PCA 2D)
 
-| Núcleo (Kernel) | Tiempo de Entrenamiento | Retención de Vectores de Soporte | Precisión (%) | Interpretación Empírica |
-| :--- | :--- | :--- | :--- | :--- |
-| **Lineal** | $4.6318$ s | $13.53\%$ ($77 / 569$) | $95.43\%$ | **Balance ideal.** Logra una excelente precisión computando rápidamente un hiperplano robusto que no memoriza el ruido. |
-| **Polinomial (d=2)** | $4.1821$ s | $13.18\%$ ($75 / 569$) | $95.43\%$ | **Equivalencia.** Se comporta de forma casi idéntica al modelo lineal en este espacio reducido, manteniendo una excelente parsimonia. |
-| **RBF (Gaussiano)** | $17.1007$ s | **$42.00\%$ ($239 / 569$)** | **$96.13\%$** | **Costo del sobreajuste.** Gana menos de $1\%$ en precisión respecto al modelo lineal, pero cuadriplica el tiempo de entrenamiento y retiene casi la mitad del dataset, indicando riesgo de sobreajuste. |
-| **Sigmoidal** | $5.2134$ s | $14.94\%$ ($85 / 569$) | $90.86\%$ | **Subóptimo.** Su arquitectura en forma de 'S' introduce distorsiones en este espacio de características. |
+| Núcleo (Kernel)           | Tiempo de Entrenamiento | Retención de Vectores de Soporte     | Precisión (%)        | Interpretación Empírica                                                                                                                                                                                         |
+| :------------------------- | :---------------------- | :------------------------------------ | :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Lineal**           | $4.6318$ s            | $13.53\%$ ($77 / 569$)            | $95.43\%$           | **Balance ideal.** Logra una excelente precisión computando rápidamente un hiperplano robusto que no memoriza el ruido.                                                                                   |
+| **Polinomial (d=2)** | $4.1821$ s            | $13.18\%$ ($75 / 569$)            | $95.43\%$           | **Equivalencia.** Se comporta de forma casi idéntica al modelo lineal en este espacio reducido, manteniendo una excelente parsimonia.                                                                      |
+| **RBF (Gaussiano)**  | $17.1007$ s           | **$42.00\%$ ($239 / 569$)** | **$96.13\%$** | **Costo del sobreajuste.** Gana menos de $1\%$ en precisión respecto al modelo lineal, pero cuadriplica el tiempo de entrenamiento y retiene casi la mitad del dataset, indicando riesgo de sobreajuste. |
+| **Sigmoidal**        | $5.2134$ s            | $14.94\%$ ($85 / 569$)            | $90.86\%$           | **Subóptimo.** Su arquitectura en forma de 'S' introduce distorsiones en este espacio de características.                                                                                                 |
 
 ### Galería de Topologías No Lineales y Proyecciones
 
 A continuación se presentan las visualizaciones de las fronteras de decisión generadas, divididas por el nivel de complejidad del experimento. Esto permite observar directamente cómo cada uno de los cuatro núcleos distorsiona el espacio geométrico subyacente.
 
 #### 1. Evaluación Topológica: Datos Sintéticos (Clústeres Circulares)
+
 <table style="width: 100%; text-align: center;">
   <tr>
     <td style="width: 50%;">
@@ -109,6 +110,7 @@ A continuación se presentan las visualizaciones de las fronteras de decisión g
 </table>
 
 #### 2. Evaluación Empírica: Breast Cancer Wisconsin (Reducción PCA)
+
 <table style="width: 100%; text-align: center;">
   <tr>
     <td style="width: 50%;">
@@ -133,16 +135,17 @@ A continuación se presentan las visualizaciones de las fronteras de decisión g
 </table>
 
 #### 3. Demostración Matemática: El Teorema de Mercer
+
 <div style="text-align: center;">
   <b>Proyección a R³ (Separabilidad Lineal en Alta Dimensionalidad)</b><br>
   <img src="./images/grafico_proyeccion_3d.png" alt="Proyección a R3" style="width: 60%;">
 </div>
 
-* **Interpretación de los hallazgos:** La auditoría numérica y visual demuestra empíricamente que no existe un "Núcleo Universal". Núcleos de dimensionalidad infinita como el RBF pueden modelar virtualmente cualquier frontera (como se aprecia en los intrincados contornos cerrados del conjunto oncológico), pero a expensas de la esparsidad y la velocidad, incrementando el riesgo de sobreajuste (*overfitting*). Para conjuntos de datos empíricos de alta varianza, modelos más rígidos (Lineal o Polinomial de bajo grado) ofrecen una parsimonia y generalización notablemente superiores.
+* **Interpretación de los hallazgos:** Los resultados obtenidos demuestran que no hay un "núcleo" perfecto. Casos como la función kernel gaussiana (RBF) pueden modelar cualquier frontera mediante su dimensionalidad infinita, sin embargo, pierde efectividad en la esparsidad y la velocidad, incrementando el riesgo de sobreajuste (_overfitting_). Por otra parte, con el conjunto de datos empíricos de alta varianza, los modelos como el lineal y el polinomial de bajo grado, ofrecen una parsimonia y generalización notablemente mejores.
 
 ## 5. Conclusión
 
-La transición hacia el uso de Funciones Kernel representa el cénit de la elegancia en la clasificación lineal. Al delegar la evaluación geométrica puramente en el producto modificado de los datos de entrada, la Máquina de Vectores de Soporte trasciende las limitaciones topológicas originales. La evaluación empírica corrobora que el éxito de una SVM en el mundo real radica en seleccionar el núcleo matemático que mejor se adapte a la naturaleza intrínseca de los datos, balanceando con precisión la frontera de decisión y el costo computacional.
+El implementar las funciones Kernel representa un salto notable en la clasificación lineal. Al delegar la evaluación geométrica exclusivamente al producto modificado de los datos de entrada, la Máquina de Vectores de Soporte mejora su capacidad superando las limitaciones topológicas originales. Asimismo, la evaluación empírica corrobora que el éxito de una SVM radica en seleccionar la función kernel que mejor se adapte a la naturaleza intrínseca de los datos, balanceando con precisión la frontera de decisión y el costo computacional.
 
 ---
 
