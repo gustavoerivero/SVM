@@ -12,19 +12,19 @@ El siguiente repositorio documenta el desarrollo e implementación práctica de 
 
 ## 📂 Estructura del Repositorio
 
-| Proyecto            | Descripción                                                                                                            | Enlace                                                                               |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| 01. Hard Margin SVM | Implementación del SVM bajo formulación primal con restricciones de margen estricto.                                   | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/01_Hard_Margin_Primal) |
-| 02. Soft Margin SVM | Implementación del SVM bajo formulación primal con restricciones de margen suave.                                      | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/02_Soft_Margin_Primal) |
-| 03. Soft Margin SVM - Modelo Dual | Implementación del SVM bajo formulación dual para la extracción analítica de Vectores de Soporte.      | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/03_Dual_Model)  |
-| 04. Funciones Kernel | Extensión del modelo Dual mediante el Teorema de Mercer para resolver topologías no lineales en alta dimensionalidad. | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/04_Kernel_Functions) |
-| 05. Estrategias Multiclase | Implementación y benchmarking computacional de las arquitecturas Uno-contra-Todos (OvR) y Uno-contra-Uno (OvO). | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/05_Multiclass) |
+| Proyecto                          | Descripción                                                                                                            | Enlace                                                                               |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 01. Hard Margin SVM               | Implementación del SVM bajo formulación primal con restricciones de margen estricto.                                  | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/01_Hard_Margin_Primal) |
+| 02. Soft Margin SVM               | Implementación del SVM bajo formulación primal con restricciones de margen suave.                                     | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/02_Soft_Margin_Primal) |
+| 03. Soft Margin SVM - Modelo Dual | Implementación del SVM bajo formulación dual para la extracción analítica de Vectores de Soporte.                   | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/03_Dual_Model)         |
+| 04. Funciones Kernel              | Extensión del modelo Dual mediante el Teorema de Mercer para resolver topologías no lineales en alta dimensionalidad. | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/04_Kernel_Functions)   |
+| 05. Estrategias Multiclase        | Implementación y benchmarking computacional de las arquitecturas Uno-contra-Todos (OvR) y Uno-contra-Uno (OvO).        | [Ir al proyecto](https://github.com/gustavoerivero/SVM/tree/main/05_Multiclass)         |
 
 ## 🛠️ Stack Tecnológico
 
 Para garantizar la reproducibilidad científica, el código ha sido desarrollado utilizando:
 
-* **Python 3.x:** Lenguaje núcleo.
+* **Python 3.x:** Lenguaje de programación.
 * **NumPy / Pandas:** Manipulación de tensores bidimensionales y generación de reportes analíticos.
 * **SciPy (Optimize):** Resolución algorítmica de problemas de programación cuadrática (`SLSQP`).
 * **Scikit-learn:** Extracción de conjuntos de datos empíricos (Oncológicos y Reconocimiento de Dígitos manuscritos) y reducción de dimensionalidad (PCA).
